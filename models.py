@@ -59,3 +59,25 @@ class Champion(models.Model):
             self.name, self.patch_season, self.patch_detail)
 
 
+class ItemStatistics:
+    ability_power = models.IntegerField(null=True)
+    ap_min = models.IntegerField(null=True)
+    ap_max = models.IntegerField(null=True)
+    armor = models.IntegerField(null=True)
+    attack_damage = models.IntegerField(null=True)
+    attack_speed = models.IntegerField(null=True)
+    cdr = models.IntegerField(null=True)
+    critical_strike = models.IntegerField(null=True)
+    golden_gen = models.IntegerField(null=True)
+    hp_regen = models.IntegerField(null=True)
+    health = models.IntegerField(null=True)
+    life_steal = models.IntegerField(null=True)
+    ls_monster = models.IntegerField(null=True)
+    magic_resist = models.IntegerField(null=True)
+    mana = models.IntegerField(null=True)
+    mana_min = models.IntegerField(null=True)
+    mana_max = models.IntegerField(null=True)
+    mana_regen = models.IntegerField(null=True)
+    move_speed = models.IntegerField(null=True)
+    ms_percent = models.IntegerField(null=True)
+

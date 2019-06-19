@@ -1,5 +1,4 @@
 from .models import Champion, EmptyResource, ManaResource, EnergyResource
-import requests
 from bs4 import BeautifulSoup as bs
 import re
 import pprint
@@ -159,3 +158,68 @@ def initialize_model():
             rs.save()
         obj.resource = rs
         obj.save()
+
+
+def collect_item_info():
+    r = redis.Redis(host='localhost', port=6379)
+    item_cate = ['Basic', 'Starter', 'Advanced', 'Finished']
+    fp_tmpl = 'E://lol_item/{} Items/'
+    for cate in item_cate:
+        fp = fp_tmpl.format(cate)
+        for fn in os.listdir(fp):
+            with open(os.path.join(fp, fn), 'rb') as fd:
+                soup = bs(fd.read(), 'html.parser')
+            tb = soup.find(id='infoboxItem')
+            item_name = fn.replace(' ', '-')
+            code_td = tb.find('td', string='Item Code')
+            code = code_td.next_sibling.text
+            r.hset('lol:item_code', item_name, code)
+            map_td = tb.find('td', string='Map Availability')
+            map = map_td.next_sibling.text
+            r.hset('lol:item_map', item_name, map)
+            tier_td = tb.find('td', string='Tier')
+            tier = tier_td.next_sibling.text
+            r.hset('lol:item_tier', item_name, tier)
+            patch_tag = soup.find(id='Patch_History'
+                                  ).parent.next_sibling.next_sibling
+            patch = patch_tag.find('a')['data-to-target-title']
+            r.hset('lol:item_patch', item_name, patch)
+            st_tr = soup.find('tr', string='Statistics')
+            recipe_tr = tb.find('tr', string='Recipe')
+            if recipe_tr:
+                recipe_tr = recipe_tr.next_sibling
+                a_tags = recipe_tr.find_all('a')
+                cost_pattern = re.compile(r'\+\s*(?P<cost>\d+)')
+                cost_tag = recipe_tr.find(string=cost_pattern)
+                if cost_tag:
+                    cost = str(cost_tag.string)
+                    cost = cost_pattern.search(cost).group('cost')
+                else:
+                    cost_tag = soup.find('b', string='Total Cost:')
+                    if not cost_tag:
+                        cost = 0
+                    else:
+                        cost_tag = cost_tag.next_sibling
+                        cost = str(cost_tag.string).strip()
+                r.hset('lol:item_cost', item_name, cost)
+                ingre_list = list()
+                for a_tag in a_tags:
+                    ingre_name = re.match(
+                        r'(?P<n>[\w\s.\'\-]+)', a_tag['title']
+                    ).group('n').strip()
+                    ingre_list.append(ingre_name)
+                else:
+                    if ingre_list:
+                        ingre_str = ':'.join(ingre_list)
+                        r.hset('lol:item_recipe', item_name, ingre_str)
+            if not st_tr:
+                continue
+            for tr_tag in st_tr.next_siblings:
+                if tr_tag.find('th'):
+                    break
+                td1 = tr_tag.find('td')
+                td2 = td1.next_sibling
+                st_name = td1.text
+                st_value = td2.text
+                r.hset('lol:item:{}'.format(item_name), st_name, st_value)
+                r.sadd('lol:statistics', st_name)
