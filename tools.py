@@ -1,4 +1,5 @@
 import requests
+import re
 
 
 def get_page(url):
@@ -19,3 +20,7 @@ def get_page(url):
             if not max_try:
                 raise
     return r
+
+
+def normalize(name):
+    return re.sub('\W', '', name).lower()
