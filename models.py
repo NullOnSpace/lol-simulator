@@ -87,7 +87,8 @@ class ItemStatistics(models.Model):
     def get_or_create(cls, **kwargs):
         qs = cls.objects.filter(**kwargs)
         if qs:
-            fields = set(field.attname for field in cls._meta.get_fields())
+            fields = set(field.attname for field in cls._meta.get_fields()
+                         if not field.is_relation)
             none_value_fields = fields.difference(set(kwargs.keys()))
             for obj in qs:
                 for field in none_value_fields:
@@ -147,8 +148,16 @@ class Recipe(models.Model):
     def get_or_create(cls, items):
         qss = set()
         for item in set(items):
-            qs = Recipe.objects.filter(Q(item1=item) | Q(item2=item)
-                                       | Q(item3=item) | Q(item4=item))
+            qs = Recipe.objects.filter(
+                Q(item1_ct=ContentType.objects.get_for_model(item),
+                  item1_id=item.id) |
+                Q(item2_ct=ContentType.objects.get_for_model(item),
+                  item2_id=item.id) |
+                Q(item3_ct=ContentType.objects.get_for_model(item),
+                  item3_id=item.id) |
+                Q(item4_ct=ContentType.objects.get_for_model(item),
+                  item4_id=item.id)
+            )
             if not qs:
                 break
             else:
@@ -170,13 +179,13 @@ class Recipe(models.Model):
                     if not recipe_list:
                         return obj
         obj = Recipe()
-        for n, item in enumerate(items):
+        for n, item in enumerate(items, 1):
             setattr(obj, 'item{}'.format(n), item)
         obj.save()
         return obj
 
     def __str__(self):
-        return ' + '.join(self.recipe_list)
+        return ' + '.join(map(str, self.recipe_list))
 
 
 class BaseItem(models.Model):

@@ -258,10 +258,13 @@ def item_to_model():
             continue
         if CompoundItem in item.__class__.__bases__:
             recipe = get_recipe_obj(name)
+            # print(name, recipe)
             if recipe is None:
-                name_list.append(name)
+                name_list.append(name.encode('utf8'))
                 print(name)
                 continue
+            else:
+                item.recipe = recipe
         item.map_availability = r.hget('lol:item_map', name).decode()
         item.name = name
         item.cost = int(r.hget('lol:item_cost', name))
@@ -293,6 +296,7 @@ def get_recipe_obj(name):
                 break
         else:
             return None
+    # print(name, ingre_list)
     recipe = Recipe.get_or_create(ingre_list)
     return recipe
 

@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  {% include 'simulator/champion_detail.html' with cu=p1_init %}
+  {% include 'simulator/champion_detail.html' with cu=p2_init %}
+  {% include 'simulator/champion_detail.html' with cu=p1_res %}
+  {% include 'simulator/champion_detail.html' with cu=p2_res %}
+{% endblock %}

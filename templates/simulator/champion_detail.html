@@ -1,0 +1,23 @@
+<div>
+  <ul>
+    <li>nickname: {{ cu.nickname }}</li>
+    <li>name: {{ cu.name }}</li>
+    <li>lv: {{ cu.level }}</li>
+  </ul>
+</div>
+<div>
+  <ul>
+    <li>health: {{ cu.current_health }}/{{ cu.max_health }}({{ cu.base_health }}+{{ cu.bonus_health }})</li>
+    <li>{{ cu.resource_type }}: {{ cu.current_resource }}/{{ cu.max_resource }}({{ cu.base_resource }}+{{ cu.bonus_resource }})</li>
+  </ul>
+</div>
+<div>
+  <ul>
+    <li>ad: {{ cu.total_attack_damage }}({{ cu.base_attack_damage }}+{{ cu.bonus_attack_damage }})</li>
+    <li>ap: {{ cu.total_ability_power }}({{ cu.base_ability_power }}+{{ cu.bonus_ability_power }})</li>
+    <li>armor: {{ cu.total_armor }}({{ cu.base_armor }}+{{ cu.bonus_armor }})</li>
+    <li>magic_resist: {{ cu.total_magic_resist }}({{ cu.base_magic_resist }}+{{ cu.bonus_magic_resist }})</li>
+    <li>attack_speed: {{ cu.total_attack_speed }}({{ cu.base_attack_speed }}+{{ cu.bonus_attack_speed }})</li>
+    <li>move_speed: {{ cu.total_move_speed }}({{ cu.base_move_speed }}+{{ cu.bonus_move_speed }})</li>
+  </ul>
+</div>
